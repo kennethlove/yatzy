@@ -3,8 +3,7 @@ from operator import attrgetter
 
 
 class Die:
-    template = """
- ---------
+    template = """ ---------
 |  {} {} {}  |
 |  {} {} {}  |
 |  {} {} {}  |

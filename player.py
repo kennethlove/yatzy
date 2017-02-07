@@ -82,8 +82,13 @@ class Human(Player):
         print(self.name.center(90))
         print('-'*90)
         print("Here's your hand:")
+        die_lines = []
         for die in self.hand:
-            print(die.display)
+            die_lines.append(die.display.split('\n'))
+        for i in range(5):
+            for die in die_lines:
+                print(die[i], end='\t')
+            print('')
         for index, key in enumerate(self.available_scores, start=1):
             print("{:^30}".format(key), end='\t')
             if not index % 3:
