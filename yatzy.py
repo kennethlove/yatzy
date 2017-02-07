@@ -84,6 +84,10 @@ def start_game():
     return human_count, bot_count
 
 if __name__ == '__main__':
-    humans, bots = start_game()
-    game = Game(humans=humans, bots=bots)
-    game.play()
+    try:
+        humans, bots = start_game()
+        game = Game(humans=humans, bots=bots)
+    except ValueError as err:
+        print("No one's playing? OK")
+    else:
+        game.play()

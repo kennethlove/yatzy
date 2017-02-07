@@ -3,6 +3,34 @@ from operator import attrgetter
 
 
 class Die:
+    template = """
+ ---------
+|  {} {} {}  |
+|  {} {} {}  |
+|  {} {} {}  |
+ ---------
+"""
+    pips = {
+        1: [' ', ' ', ' ',
+            ' ','*', ' ',
+            ' ', ' ', ' '],
+        2: ['*', ' ', ' ',
+            ' ', ' ', ' ',
+            ' ', ' ', '*'],
+        3: ['*', ' ', ' ',
+            ' ', '*', ' ',
+            ' ', ' ', '*'],
+        4: ['*', ' ', '*',
+            ' ', ' ', ' ',
+            '*', ' ', '*'],
+        5: ['*', ' ', '*',
+            ' ', '*', ' ',
+            '*', ' ', '*'],
+        6: ['*', ' ', '*',
+            '*', ' ', '*',
+            '*', ' ', '*']
+    }
+
     def __init__(self, value=0):
         self.value = value or random.randint(1, 6)
         self.rolls = 1
@@ -30,6 +58,11 @@ class Die:
 
     def __radd__(self, other):
         return self.value + other
+
+    @property
+    def display(self):
+        return self.template.format(*self.pips[self.value])
+
 
 
 class Hand(list):

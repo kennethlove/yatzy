@@ -81,7 +81,9 @@ class Human(Player):
         super().play_round()
         print(self.name.center(90))
         print('-'*90)
-        print("Here's your hand: {}".format(self.hand))
+        print("Here's your hand:")
+        for die in self.hand:
+            print(die.display)
         for index, key in enumerate(self.available_scores, start=1):
             print("{:^30}".format(key), end='\t')
             if not index % 3:
