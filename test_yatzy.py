@@ -1,9 +1,28 @@
+from operator import attrgetter
 from test.support import captured_stdout, captured_stdin
 import unittest
 
 import yatzy
 import player
 import dice
+
+player_scores = {
+    'ones': None,
+    'twos': None,
+    'threes': None,
+    'fours': None,
+    'fives': None,
+    'sixes': None,
+    'one_pair': None,
+    'two_pairs': None,
+    'three_of_a_kind': None,
+    'four_of_a_kind': None,
+    'small_straight': None,
+    'large_straight': None,
+    'full_house': None,
+    'chance': None,
+    'yatzy': None
+}
 
 
 class GameTests(unittest.TestCase):
@@ -47,6 +66,14 @@ class PlayerTests(unittest.TestCase):
     def test_bot(self):
         bot1 = player.Bot(1)
         self.assertIn(bot1.name, player.BOT_NAMES)
+
+    def test_score_sorting(self):
+        human1 = player.Human(1, "Kenneth")
+        human2 = player.Human(1, "Elaine")
+        for category in player_scores:
+            human1.scores[category] = 1
+            human2.scores[category] = 5
+        self.assertGreater(human2.score, human1.score)
 
 
 class DiceTests(unittest.TestCase):
@@ -176,4 +203,4 @@ class HandTests(unittest.TestCase):
     def test_max_score(self):
         hand = dice.Hand()
         hand[:] = self._seed([2, 2, 5, 5, 5])
-        self.assertEqual(hand.score_max(), 19)
+        self.assertEqual(hand.score_max(), 'full_house')

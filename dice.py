@@ -198,18 +198,30 @@ class Hand(list):
             if two and three:
                 return (two * 2) + (three * 3)
 
-    def score_max(self):
-        return max([
-            self.score_one_pair(),
-            self.score_two_pairs(),
-            self.score_three_of_a_kind(),
-            self.score_four_of_a_kind(),
-            self.score_yatzy(),
-            self.score_small_straight(),
-            self.score_large_straight(),
-            self.score_full_house(),
-            self.score_chance()
-        ])
+    def score_max(self, limit=None):
+        scores = {
+            'ones': self.score_ones(),
+            'twos': self.score_twos(),
+            'threes': self.score_threes(),
+            'fours': self.score_fours(),
+            'fives': self.score_fives(),
+            'sixes': self.score_sixes(),
+            'one_pair': self.score_one_pair(),
+            'two_pairs': self.score_two_pairs(),
+            'three_of_a_kind': self.score_three_of_a_kind(),
+            'four_of_a_kind': self.score_four_of_a_kind(),
+            'small_straight': self.score_small_straight(),
+            'large_straight': self.score_large_straight(),
+            'full_house': self.score_full_house(),
+            'chance': self.score_chance(),
+            'yatzy': self.score_yatzy()
+        }
+        if limit:
+            for key in scores.copy():
+                if key not in limit:
+                    del scores[key]
+        return max(scores, key=scores.get)
+
 
     def __str__(self):
         return ', '.join([str(die) for die in self])

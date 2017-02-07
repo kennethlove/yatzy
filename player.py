@@ -79,6 +79,8 @@ class Human(Player):
 
     def play_round(self):
         super().play_round()
+        print(self.name)
+        print('-'*len(self.name))
         print("Here's your hand: {}".format(self.hand))
         self.show_available_scores()
         self.get_score()
@@ -98,4 +100,11 @@ class Bot(Player):
 
     def __hash__(self):
         return id(str(self.name))
+
+    def play_round(self):
+        super().play_round()
+        best_move = self.hand.score_max(self.available_scores)
+        score = self.hand.score(best_move)
+        self.scores[best_move] = score
+        return
 

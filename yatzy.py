@@ -46,10 +46,38 @@ class Game:
         while self.current_round <= 15:
             self.play_round()
         else:
-            winner = max(self.humans+self.bots, key=attrgetter('score'))
-            print("{} won with {} points!".format(winner.name, winner.score))
+            all_players = list(
+                sorted(
+                    self.humans+self.bots,
+                    key=attrgetter('score'),
+                    reverse=True
+                )
+            )
+            print("{} won with {} points!".format(all_players[0].name, all_players[0].score))
+            for player in all_players[1:]:
+                print("{} finished with {} points".format(player.name, player.score))
 
+
+def start_game():
+    while True:
+        try:
+            human_count = int(input("How many human players? "))
+        except ValueError:
+            continue
+        else:
+            break
+
+    while True:
+        try:
+            bot_count = int(input("How many computer players? "))
+        except ValueError:
+            continue
+        else:
+            break
+
+    return human_count, bot_count
 
 if __name__ == '__main__':
-    game = Game(humans=1, bots=1)
+    humans, bots = start_game()
+    game = Game(humans=humans, bots=bots)
     game.play()
