@@ -1,4 +1,5 @@
 import random
+from operator import attrgetter
 
 
 class Die:
@@ -36,6 +37,25 @@ class Hand(list):
         super().__init__(*args, **kwargs)
         for _ in range(5):
             self.append(Die())
+        self[:] = list(sorted(self, key=attrgetter('value')))
+
+        self.scorers = {
+            'ones': self.score_ones,
+            'twos': self.score_twos,
+            'threes': self.score_threes,
+            'fours': self.score_fours,
+            'fives': self.score_fives,
+            'sixes': self.score_sixes,
+            'one_pair': self.score_one_pair,
+            'two_pairs': self.score_two_pairs,
+            'three_of_a_kind': self.score_three_of_a_kind,
+            'four_of_a_kind': self.score_four_of_a_kind,
+            'small_straight': self.score_small_straight,
+            'large_straight': self.score_large_straight,
+            'full_house': self.score_full_house,
+            'chance': self.score_chance,
+            'yatzy': self.score_yatzy,
+        }
 
     def _by_value(self, value):
         dice = []
@@ -169,11 +189,14 @@ class Hand(list):
         return 0
 
     def score_full_house(self):
-        two =  max(self._of_a_kind[2])
-        three =  max(self._of_a_kind[3])
-        if two and three:
-            return (two * 2) + (three * 3)
-        return 0
+        try:
+            two = max(self._of_a_kind[2])
+            three = max(self._of_a_kind[3])
+        except ValueError:
+            return 0
+        else:
+            if two and three:
+                return (two * 2) + (three * 3)
 
     def score_max(self):
         return max([
@@ -187,3 +210,9 @@ class Hand(list):
             self.score_full_house(),
             self.score_chance()
         ])
+
+    def __str__(self):
+        return ', '.join([str(die) for die in self])
+
+    def score(self, what):
+        return self.scorers[what]()

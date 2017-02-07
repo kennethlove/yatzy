@@ -1,5 +1,7 @@
 import random
 
+import dice
+
 BOT_NAMES = [
     'Acid Burn',
     'Crash Override',
@@ -16,10 +18,44 @@ BOT_NAMES = [
 class Player:
     def __init__(self, order):
         self.order = order
-        self.score = 0
+        self.hand = None
+
+        self.scores = {
+            'ones': None,
+            'twos': None,
+            'threes': None,
+            'fours': None,
+            'fives': None,
+            'sixes': None,
+            'one_pair': None,
+            'two_pairs': None,
+            'three_of_a_kind': None,
+            'four_of_a_kind': None,
+            'small_straight': None,
+            'large_straight': None,
+            'full_house': None,
+            'chance': None,
+            'yatzy': None
+        }
+
+    @property
+    def score(self):
+        return sum([score for score in self.scores.values() if score is not None])
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, str(self))
+
+    def play_round(self):
+        self.hand = dice.Hand()
+        return
+
+    @property
+    def available_scores(self):
+        scores = []
+        for kind, score in self.scores.items():
+            if score is None:
+                scores.append(kind)
+        return scores
 
 
 class Human(Player):
@@ -29,6 +65,24 @@ class Human(Player):
 
     def __str__(self):
         return self.name
+
+    def show_available_scores(self):
+        print("You can score: {}".format(', '.join(self.available_scores)))
+
+    def get_score(self):
+        what_to_score = input("What do you want to score? ")
+        if what_to_score not in self.available_scores:
+            return self.get_score()
+        score = self.hand.score(what_to_score)
+        self.scores[what_to_score] = score
+        return
+
+    def play_round(self):
+        super().play_round()
+        print("Here's your hand: {}".format(self.hand))
+        self.show_available_scores()
+        self.get_score()
+        return
 
 
 class Bot(Player):

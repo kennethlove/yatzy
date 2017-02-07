@@ -1,5 +1,3 @@
-from functools import reduce
-from operator import add
 from test.support import captured_stdout, captured_stdin
 import unittest
 
