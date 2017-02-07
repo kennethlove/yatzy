@@ -55,15 +55,127 @@ class DiceTests(unittest.TestCase):
     def test_die(self):
         die = dice.Die()
         self.assertIn(die, range(1, 7))
+        self.assertEqual(die.rolls, 1)
+
+    def test_die_value(self):
+        die = dice.Die(8)
+        self.assertEqual(die.value, 8)
+
+    def test_reroll(self):
+        die = dice.Die()
+        die.reroll()
+        self.assertEqual(die.rolls, 2)
+
+    def test_roll_limit(self):
+        die = dice.Die()
+        die.rolls = 3
+
+        with self.assertRaises(Exception):
+            die.reroll()
+
+
+class HandTests(unittest.TestCase):
+    def setUp(self):
+        self.dice = [dice.Die(n) for n in range(1, 7)]
+
+    def _seed(self, nums):
+        return [dice.Die(num) for num in nums]
 
     def test_hand(self):
         hand = dice.Hand()
         self.assertEqual(len(hand), 5)
 
-    def test_reroll(self):
+    def test_ones(self):
         hand = dice.Hand()
-        print(hand)
-        print(reduce(add, hand))
-        hand[0].roll()
-        print(reduce(add, hand))
-        print(hand)
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_ones(), 1)
+
+    def test_twos(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_twos(), 2)
+
+    def test_threes(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_threes(), 3)
+
+    def test_fours(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_fours(), 4)
+
+    def test_fives(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_fives(), 5)
+
+    def test_sixes(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[1:]
+        self.assertEqual(hand.score_sixes(), 6)
+
+    def test_one_pair(self):
+        hand = dice.Hand()
+        hand[:] = [self.dice[0], self.dice[0], self.dice[3]]
+        self.assertEqual(hand.score_one_pair(), 2)
+
+    def test_one_pair_no_pairs(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_one_pair(), 0)
+
+    def test_two_pairs(self):
+        hand = dice.Hand()
+        hand[:] = [self.dice[0], self.dice[0], self.dice[3], self.dice[3]]
+        self.assertEqual(hand.score_two_pairs(), 10)
+
+    def test_two_pairs_no_pairs(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[1:]
+        self.assertEqual(hand.score_two_pairs(), 0)
+
+    def test_two_pairs_one_pair(self):
+        hand = dice.Hand()
+        hand[:] = [self.dice[0], self.dice[0], self.dice[3]]
+        self.assertEqual(hand.score_two_pairs(), 2)
+
+    def test_three_of_a_kind(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([2, 2, 2, 4, 5])
+        self.assertEqual(hand.score_three_of_a_kind(), 6)
+
+    def test_four_of_a_kind(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([2, 2, 2, 2, 5])
+        self.assertEqual(hand.score_four_of_a_kind(), 8)
+
+    def test_yatzy(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([2, 2, 2, 2, 2])
+        self.assertEqual(hand.score_yatzy(), 50)
+
+    def test_small_straight(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[:5]
+        self.assertEqual(hand.score_small_straight(), 15)
+
+    def test_large_straight(self):
+        hand = dice.Hand()
+        hand[:] = self.dice[1:]
+        self.assertEqual(hand.score_large_straight(), 20)
+
+    def test_full_house(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([1, 1, 1, 5, 5])
+        self.assertEqual(hand.score_full_house(), 13)
+
+    def test_chance(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([4, 3, 3, 2, 1])
+        self.assertEqual(hand.score_chance(), 13)
+
+    def test_max_score(self):
+        hand = dice.Hand()
+        hand[:] = self._seed([2, 2, 5, 5, 5])
+        self.assertEqual(hand.score_max(), 19)
