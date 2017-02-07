@@ -79,10 +79,14 @@ class Human(Player):
 
     def play_round(self):
         super().play_round()
-        print(self.name)
-        print('-'*len(self.name))
+        print(self.name.center(90))
+        print('-'*90)
         print("Here's your hand: {}".format(self.hand))
-        self.show_available_scores()
+        for index, key in enumerate(self.available_scores, start=1):
+            print("{:^30}".format(key), end='\t')
+            if not index % 3:
+                print('')
+        print('\n', '-'*90)
         self.get_score()
         return
 

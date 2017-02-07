@@ -1,6 +1,11 @@
 from operator import attrgetter
+import os
 
 import player
+
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 class Game:
@@ -36,6 +41,7 @@ class Game:
 
     def play_round(self):
         for human in self.humans:
+            clear()
             human.play_round()
         for bot in self.bots:
             bot.play_round()
