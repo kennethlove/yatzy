@@ -48,9 +48,9 @@ class Yatzy:
         ))
         print('-'*self.game_board_width)
 
-    def human_precursor(self, human):
+    def human_precursor(self, human, dice_key=False):
         self.show_player_info(human)
-        human.hand.display(self.game_board_width)
+        human.hand.display(self.game_board_width, dice_key)
         print('-'*self.game_board_width)
 
     def get_human_action(self, human):
@@ -75,13 +75,24 @@ class Yatzy:
         score = human.hand.score(category.name)
         human.scoresheet.score_category(category_to_score, score)
 
+    def get_human_reroll(self, human):
+        clear()
+        self.human_precursor(human, dice_key=True)
+        try:
+            which_die = int(input("Which die would you like to reroll? "))
+        except ValueError:
+            return get_human_reroll(human)
+        else:
+            human.hand[which_die-1].reroll()
+        return self.human_round(human)
+
     def human_round(self, human):
         self.human_precursor(human)
         action = self.get_human_action(human)
         if action == 's':
             self.get_human_score(human)
         else:
-            self.human_reroll(human)
+            self.get_human_reroll(human)
 
     def play_round(self):
         for human in self.humans:

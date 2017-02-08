@@ -272,6 +272,13 @@ class Hand(list):
             for die in die_lines:
                 print('{0:^{1}}'.format(die[i], width//5), end='')
             print('')
+        if show_key:
+            for num in range(1, 6):
+                if self[num-1].can_be_rerolled:
+                    print('{0:^{1}}'.format('[{}]'.format(num), width//5), end='')
+                else:
+                    print('{0:^{1}}'.format('', width//5), end='')
+            print('')
 
     @property
     def left_to_reroll(self):
