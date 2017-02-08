@@ -3,11 +3,11 @@ from operator import attrgetter
 
 
 class Die:
-    template = """ ---------
+    template = """---------
 |  {} {} {}  |
 |  {} {} {}  |
 |  {} {} {}  |
- ---------
+---------
 """
     pips = {
         1: [' ', ' ', ' ',
@@ -61,7 +61,6 @@ class Die:
     @property
     def display(self):
         return self.template.format(*self.pips[self.value])
-
 
 
 class Hand(list):
@@ -181,7 +180,6 @@ class Hand(list):
 
         return sum(tops)
 
-
     def score_one_pair(self):
         score = [0]
 
@@ -260,3 +258,12 @@ class Hand(list):
 
     def score(self, what):
         return self.scorers[what]()
+
+    def display(self, width=0, show_key=False):
+        die_lines = []
+        for die in self:
+            die_lines.append(die.display.split('\n'))
+        for i in range(5):
+            for die in die_lines:
+                print('{0:^{1}}'.format(die[i], width//5), end='')
+            print('')

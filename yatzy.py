@@ -8,7 +8,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-class Game:
+class Yatzy:
     def __init__(self, humans=0, bots=0):
         self.all_computer = (not humans and bots)
         self.humans = []
@@ -16,6 +16,8 @@ class Game:
 
         self.current_round = 1
         self.scores = {}
+
+        self.game_board_width = 90
 
         if humans and not self.all_computer:
             self.humans = self.get_humans(humans)
@@ -39,10 +41,23 @@ class Game:
             bots.add(player.Bot(len(bots)+1))
         return list(sorted(list(bots), key=lambda bot: bot.order))
 
+    def show_player_info(self, player):
+        print('{0:^{1}}'.format(
+            '{} ({})'.format(player.name, player.score),
+            self.game_board_width
+        ))
+        print('-'*self.game_board_width)
+
+    def human_round(self, human):
+        self.show_player_info(human)
+        human.hand.display(self.game_board_width)
+
     def play_round(self):
         for human in self.humans:
             clear()
-            human.play_round()
+            human.roll()
+            self.human_round(human)
+            # human.play_round()
         for bot in self.bots:
             bot.play_round()
         self.current_round += 1
@@ -86,7 +101,7 @@ def start_game():
 if __name__ == '__main__':
     try:
         humans, bots = start_game()
-        game = Game(humans=humans, bots=bots)
+        game = Yatzy(humans=humans, bots=bots)
     except ValueError as err:
         print("No one's playing? OK")
     else:

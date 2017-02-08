@@ -15,12 +15,9 @@ BOT_NAMES = [
 ]
 
 
-class Player:
-    def __init__(self, order):
-        self.order = order
-        self.hand = None
-
-        self.scores = {
+class Scoresheet:
+    def __init__(self):
+        self.categories = {
             'ones': None,
             'twos': None,
             'threes': None,
@@ -40,22 +37,33 @@ class Player:
 
     @property
     def score(self):
-        return sum([score for score in self.scores.values() if score is not None])
+        return sum([score for score in self.categories.values() if score is not None])
+
+    @property
+    def open_categories(self):
+        categories = []
+        for kind, score in self.categories.items():
+            if score is None:
+                categories.append(kind)
+        return categories
+
+
+class Player:
+    def __init__(self, order):
+        self.order = order
+        self.scoresheet = Scoresheet()
+        self.hand = None
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, str(self))
 
-    def play_round(self):
+    def roll(self):
         self.hand = dice.Hand()
         return
 
     @property
-    def available_scores(self):
-        scores = []
-        for kind, score in self.scores.items():
-            if score is None:
-                scores.append(kind)
-        return scores
+    def score(self):
+        return self.scoresheet.score
 
 
 class Human(Player):
@@ -67,35 +75,35 @@ class Human(Player):
         return self.name
 
     def show_available_scores(self):
-        print("You can score: {}".format(', '.join(self.available_scores)))
+        print(
+            "You can score: {}".format(
+                ', '.join(
+                    self.scoresheet.open_categories
+                )
+            )
+        )
 
     def get_score(self):
         what_to_score = input("What do you want to score? ")
-        if what_to_score not in self.available_scores:
+        if what_to_score not in self.scoresheet.open_categories:
             return self.get_score()
         score = self.hand.score(what_to_score)
-        self.scores[what_to_score] = score
+        self.scoresheet.categories[what_to_score] = score
         return
 
     def play_round(self):
         super().play_round()
-        print(self.name.center(90))
-        print('-'*90)
-        print("Here's your hand:")
-        die_lines = []
-        for die in self.hand:
-            die_lines.append(die.display.split('\n'))
-        for i in range(5):
-            for die in die_lines:
-                print(die[i], end='\t')
-            print('')
-        for index, key in enumerate(self.available_scores, start=1):
-            print("{:^30}".format(key), end='\t')
-            if not index % 3:
-                print('')
-        print('\n', '-'*90)
-        self.get_score()
-        return
+
+    # def play_round(self):
+    #     super().play_round()
+    #     # print('{:^90}'.format(self.hand.display()))
+    #     for index, key in enumerate(self.scoresheet.open_categories, start=1):
+    #         print("{:^30}".format(key), end='\t')
+    #         if not index % 3:
+    #             print('')
+    #     print('\n', '-'*90)
+    #     self.get_score()
+    #     return
 
 
 class Bot(Player):
@@ -114,8 +122,8 @@ class Bot(Player):
 
     def play_round(self):
         super().play_round()
-        best_move = self.hand.score_max(self.available_scores)
+        best_move = self.hand.score_max(self.scoresheet.open_categories)
         score = self.hand.score(best_move)
-        self.scores[best_move] = score
+        self.scoresheet.categories[best_move] = score
         return
 

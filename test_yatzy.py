@@ -28,13 +28,13 @@ player_scores = {
 class GameTests(unittest.TestCase):
     def test_bad_init(self):
         with self.assertRaises(ValueError):
-            game = yatzy.Game()
+            game = yatzy.Yatzy()
 
     def test_one_human(self):
         with captured_stdout() as stdout, captured_stdin() as stdin:
             stdin.write("Kenneth")
             stdin.seek(0)
-            game = yatzy.Game(humans=1)
+            game = yatzy.Yatzy(humans=1)
         self.assertEqual("Name for Player 1: ", stdout.getvalue())
         self.assertEqual(len(game.humans), 1)
 
@@ -43,19 +43,30 @@ class GameTests(unittest.TestCase):
             stdin.write("Kenneth\n")
             stdin.write("Elaine\n")
             stdin.seek(0)
-            game = yatzy.Game(humans=2)
+            game = yatzy.Yatzy(humans=2)
         self.assertIn("Name for Player 2:", stdout.getvalue())
         self.assertEqual(len(game.humans), 2)
         self.assertEqual(game.humans[1].name, "Elaine")
 
     def test_one_bot(self):
-        game = yatzy.Game(bots=1)
+        game = yatzy.Yatzy(bots=1)
         self.assertEqual(len(game.bots), 1)
 
     def test_two_bots(self):
-        game = yatzy.Game(bots=2)
+        game = yatzy.Yatzy(bots=2)
         self.assertEqual(len(game.bots), 2)
         self.assertEqual(len({game.bots[0].name, game.bots[1].name}), 2)
+
+    def test_player_display(self):
+        with captured_stdout() as stdout, captured_stdin() as stdin:
+            stdin.write("Kenneth\n")
+            stdin.seek(0)
+            game = yatzy.Yatzy(humans=1)
+            stdout.seek(0)
+            game.show_player_info(game.humans[0])
+        output = stdout.getvalue()
+        self.assertEqual(len(output.split('\n')[0]), 90)
+        self.assertIn(game.humans[0].name, output)
 
 
 class PlayerTests(unittest.TestCase):
@@ -71,8 +82,8 @@ class PlayerTests(unittest.TestCase):
         human1 = player.Human(1, "Kenneth")
         human2 = player.Human(1, "Elaine")
         for category in player_scores:
-            human1.scores[category] = 1
-            human2.scores[category] = 5
+            human1.scoresheet.categories[category] = 1
+            human2.scoresheet.categories[category] = 5
         self.assertGreater(human2.score, human1.score)
 
 
