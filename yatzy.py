@@ -1,6 +1,8 @@
 from operator import attrgetter
 import os
 
+import sys
+
 import player
 
 
@@ -49,6 +51,7 @@ class Yatzy:
         print('-'*self.game_board_width)
 
     def human_precursor(self, human, dice_key=False):
+        clear()
         self.show_player_info(human)
         human.hand.display(self.game_board_width, dice_key)
         print('-'*self.game_board_width)
@@ -56,10 +59,12 @@ class Yatzy:
     def get_human_action(self, human):
         prompt = "[S]core"
         if human.hand.left_to_reroll:
-            prompt += " or [R]eroll"
-        action = input('{}: '.format(prompt)).lower()
-        if action not in 'sr':
-            return show_human_prompt()
+            prompt += ", [R]eroll,"
+        action = input('{} or [Q]uit: '.format(prompt)).lower()
+        if action not in 'srq':
+            return self.get_human_action(human)
+        if action == 'q':
+            sys.exit(0)
         return action
 
     def get_human_score(self, human):
@@ -67,7 +72,9 @@ class Yatzy:
         self.human_precursor(human)
         human.scoresheet.display(self.game_board_width)
         print('-'*self.game_board_width)
-        category_to_score = input("What do you want to score? ").upper()
+        category_to_score = input("What do you want to score? Press ENTER to cancel. ").upper()
+        if not category_to_score:
+            return self.human_round(human)
         if category_to_score not in human.scoresheet.open_keys:
             return self.get_human_score(human)
         else:
@@ -78,13 +85,19 @@ class Yatzy:
     def get_human_reroll(self, human):
         clear()
         self.human_precursor(human, dice_key=True)
-        try:
-            which_die = int(input("Which die would you like to reroll? "))
-        except ValueError:
-            return get_human_reroll(human)
+        which_die = input("Which die would you like to reroll? Press ENTER to cancel. ")
+        if which_die:
+            try:
+                which_die = int(which_die)
+                human.hand[which_die-1].reroll()
+            except ValueError:
+                return self.get_human_reroll(human)
+            except Exception:
+                return self.get_human_reroll(human)
+            else:
+                return
         else:
-            human.hand[which_die-1].reroll()
-        return self.human_round(human)
+            return self.human_round(human)
 
     def human_round(self, human):
         self.human_precursor(human)
@@ -96,7 +109,6 @@ class Yatzy:
 
     def play_round(self):
         for human in self.humans:
-            clear()
             human.roll()
             self.human_round(human)
         for bot in self.bots:
