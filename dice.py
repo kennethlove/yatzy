@@ -30,15 +30,21 @@ class Die:
             '*', ' ', '*']
     }
 
+    MAX_ROLLS = 3
+
     def __init__(self, value=0):
         self.value = value or random.randint(1, 6)
         self.rolls = 1
 
     def reroll(self):
-        if self.rolls == 3:
+        if self.rolls == self.MAX_ROLLS:
             raise Exception('Can only roll a die 3 times')
         self.value = random.randint(1, 6)
         self.rolls += 1
+
+    @property
+    def can_be_rerolled(self):
+        return self.rolls < self.MAX_ROLLS
 
     def __eq__(self, other):
         return self.value == other
@@ -252,7 +258,6 @@ class Hand(list):
                     del scores[key]
         return max(scores, key=scores.get)
 
-
     def __str__(self):
         return ', '.join([str(die) for die in self])
 
@@ -267,3 +272,7 @@ class Hand(list):
             for die in die_lines:
                 print('{0:^{1}}'.format(die[i], width//5), end='')
             print('')
+
+    @property
+    def left_to_reroll(self):
+        return any([die.can_be_rerolled for die in self])

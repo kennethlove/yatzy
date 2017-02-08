@@ -48,16 +48,46 @@ class Yatzy:
         ))
         print('-'*self.game_board_width)
 
-    def human_round(self, human):
+    def human_precursor(self, human):
         self.show_player_info(human)
         human.hand.display(self.game_board_width)
+        print('-'*self.game_board_width)
+
+    def get_human_action(self, human):
+        prompt = "[S]core"
+        if human.hand.left_to_reroll:
+            prompt += " or [R]eroll"
+        action = input('{}: '.format(prompt)).lower()
+        if action not in 'sr':
+            return show_human_prompt()
+        return action
+
+    def get_human_score(self, human):
+        clear()
+        self.human_precursor(human)
+        human.scoresheet.display(self.game_board_width)
+        print('-'*self.game_board_width)
+        category_to_score = input("What do you want to score? ").upper()
+        if category_to_score not in human.scoresheet.open_keys:
+            return self.get_human_score(human)
+        else:
+            category = human.scoresheet.get_by_key(category_to_score)
+        score = human.hand.score(category.name)
+        human.scoresheet.score_category(category_to_score, score)
+
+    def human_round(self, human):
+        self.human_precursor(human)
+        action = self.get_human_action(human)
+        if action == 's':
+            self.get_human_score(human)
+        else:
+            self.human_reroll(human)
 
     def play_round(self):
         for human in self.humans:
             clear()
             human.roll()
             self.human_round(human)
-            # human.play_round()
         for bot in self.bots:
             bot.play_round()
         self.current_round += 1
@@ -80,21 +110,9 @@ class Yatzy:
 
 
 def start_game():
-    while True:
-        try:
-            human_count = int(input("How many human players? "))
-        except ValueError:
-            continue
-        else:
-            break
-
-    while True:
-        try:
-            bot_count = int(input("How many computer players? "))
-        except ValueError:
-            continue
-        else:
-            break
+    print("How many are playing? (Press ENTER for 0)")
+    human_count = int(input("Human players? ") or '0')
+    bot_count = int(input("Computer players? ") or '0')
 
     return human_count, bot_count
 

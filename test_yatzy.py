@@ -82,8 +82,8 @@ class PlayerTests(unittest.TestCase):
         human1 = player.Human(1, "Kenneth")
         human2 = player.Human(1, "Elaine")
         for category in player_scores:
-            human1.scoresheet.categories[category] = 1
-            human2.scoresheet.categories[category] = 5
+            human1.scoresheet[category].score = 1
+            human2.scoresheet[category].score = 5
         self.assertGreater(human2.score, human1.score)
 
 
